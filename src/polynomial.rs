@@ -14,7 +14,8 @@ pub(crate) const ZETAS_TIMES_MONTGOMERY_R: [i16; 128] = [
 pub(crate) const VECTORS_IN_RING_ELEMENT: usize =
     super::constants::COEFFICIENTS_IN_RING_ELEMENT / FIELD_ELEMENTS_IN_VECTOR;
 
-#[cfg_attr(eurydice, derive(Clone, Copy))]
+// XXX: We don't want to copy this. But for eurydice we have to have this.
+#[derive(Clone, Copy)]
 pub(crate) struct PolynomialRingElement<Vector: Operations> {
     pub(crate) coefficients: [Vector; VECTORS_IN_RING_ELEMENT],
 }
@@ -41,16 +42,22 @@ impl<Vector: Operations> PolynomialRingElement<Vector> {
     /// sum of their constituent coefficients.
     #[inline(always)]
     pub(crate) fn add_to_ring_element<const K: usize>(&mut self, rhs: &Self) {
+        // The semicolon and parentheses at the end of loop are a workaround
+        // for the following bug https://github.com/hacspec/hax/issues/720
         for i in 0..self.coefficients.len() {
             self.coefficients[i] = Vector::add(self.coefficients[i], &rhs.coefficients[i]);
         }
+        ()
     }
 
     #[inline(always)]
     pub fn poly_barrett_reduce(&mut self) {
+        // The semicolon and parentheses at the end of loop are a workaround
+        // for the following bug https://github.com/hacspec/hax/issues/720
         for i in 0..VECTORS_IN_RING_ELEMENT {
             self.coefficients[i] = Vector::barrett_reduce(self.coefficients[i]);
         }
+        ()
     }
 
     #[inline(always)]
@@ -95,6 +102,8 @@ impl<Vector: Operations> PolynomialRingElement<Vector> {
 
     #[inline(always)]
     pub(crate) fn add_error_reduce(&mut self, error: &Self) {
+        // The semicolon and parentheses at the end of loop are a workaround
+        // for the following bug https://github.com/hacspec/hax/issues/720
         for j in 0..VECTORS_IN_RING_ELEMENT {
             let coefficient_normal_form =
                 Vector::montgomery_multiply_by_constant(self.coefficients[j], 1441);
@@ -104,10 +113,13 @@ impl<Vector: Operations> PolynomialRingElement<Vector> {
                 &error.coefficients[j],
             ));
         }
+        ()
     }
 
     #[inline(always)]
     pub(crate) fn add_standard_error_reduce(&mut self, error: &Self) {
+        // The semicolon and parentheses at the end of loop are a workaround
+        // for the following bug https://github.com/hacspec/hax/issues/720
         for j in 0..VECTORS_IN_RING_ELEMENT {
             // The coefficients are of the form aR^{-1} mod q, which means
             // calling to_montgomery_domain() on them should return a mod q.
@@ -118,6 +130,7 @@ impl<Vector: Operations> PolynomialRingElement<Vector> {
                 &error.coefficients[j],
             ));
         }
+        ()
     }
 
     /// Given two `KyberPolynomialRingElement`s in their NTT representations,

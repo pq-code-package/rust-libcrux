@@ -1,38 +1,77 @@
-[package]
-name = "libcrux-ml-kem"
-version = "0.0.2-alpha.1"
+# SPDX-FileCopyrightText: 2024 Cryspen Sarl <info@cryspen.com>
+#
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: MIT
+
+[workspace.package]
+version = "0.0.2-alpha.3"
 authors = ["Cryspen"]
 license = "Apache-2.0"
-homepage = "https://github.com/cryspen/libcrux"
+homepage = "https://github.com/pq-code-package/mlkem-rust-libcrux"
 edition = "2021"
-repository = "https://github.com/cryspen/libcrux"
+repository = "https://github.com/pq-code-package/mlkem-rust-libcrux"
 readme = "Readme.md"
-exclude = ["/tests"]
 
-[workspace]
-member = ["."]
+[package]
+name = "libcrux-ml-kem"
+version.workspace = true
+authors.workspace = true
+license.workspace = true
+homepage.workspace = true
+edition.workspace = true
+repository.workspace = true
+readme = "README.md"
+description = "Libcrux ML-KEM & Kyber implementations"
+exclude = [
+    "/tests",
+    "/implementation_notes.pdf",
+    "/c",
+    "/proofs",
+    "/c.sh",
+    "/c.yaml",
+    "/hax.py",
+]
+
+[lib]
+bench = false # so libtest doesn't eat the arguments to criterion
 
 [dependencies]
-rand_core = { version = "0.6" }
-libcrux-platform = { version = "0.0.2-alpha.1" }
-libcrux-sha3 = { version = "0.0.2-alpha.1" }
-libcrux-intrinsics = {  version = "0.0.2-alpha.1" }
+rand = { version = "0.8", optional = true }
+libcrux-platform = { version = "0.0.2-beta.2" }
+libcrux-sha3 = { version = "0.0.2-beta.2" }
+libcrux-intrinsics = { version = "0.0.2-beta.2" }
 
 # This is only required for verification.
 # The hax config is set by the hax toolchain.
 [target.'cfg(hax)'.dependencies]
-hax-lib = { git = "https://github.com/hacspec/hax/" }
+hax-lib = { version = "0.1.0-alpha.1", git = "https://github.com/hacspec/hax/" }
 
 [features]
-default = ["std", "mlkem512", "mlkem768", "mlkem1024"]
-simd128 = ["libcrux-sha3/simd128"]
-simd256 = ["libcrux-sha3/simd256"]
+# By default all variants and std are enabled.
+default = ["std", "mlkem512", "mlkem768", "mlkem1024", "rand"]
+
+# Hardware features can be force enabled.
+# It is not recommended to use these. This crate performs CPU feature detection
+# and enables the features when they are available.
+simd128 = ["libcrux-sha3/simd128", "libcrux-intrinsics/simd128"]
+simd256 = ["libcrux-sha3/simd256", "libcrux-intrinsics/simd256"]
+
+# Features for the different key sizes of ML-KEM
 mlkem512 = []
 mlkem768 = []
 mlkem1024 = []
-std = []
+
+# Enable Round 3 Kyber in addition to ML-KEM
 kyber = []
+
+# Code that is not yet verified
 pre-verification = []
+
+# APIs that sample their own randomness
+rand = ["dep:rand"]
+
+# std support
+std = []
 
 [dev-dependencies]
 rand = { version = "0.8" }
@@ -45,7 +84,25 @@ criterion = "0.5"
 name = "ml-kem"
 harness = false
 
-[profile.release]
-lto = "fat"
-codegen-units = 1
-panic = "abort"
+[[example]]
+name = "encapsulate"
+required-features = ["mlkem768"]
+
+[[example]]
+name = "decapsulate"
+required-features = ["mlkem768"]
+
+[[example]]
+name = "keygen"
+required-features = ["mlkem768"]
+
+[package.metadata."docs.rs"]
+features = ["pre-verification", "kyber"]
+rustdoc-args = ["--cfg", "doc_cfg"]
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = [
+    'cfg(hax)',
+    'cfg(eurydice)',
+    'cfg(doc_cfg)',
+] }

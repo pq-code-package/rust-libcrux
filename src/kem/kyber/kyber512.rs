@@ -32,27 +32,28 @@ const ETA2_RANDOMNESS_SIZE: usize = ETA2 * 64;
 const IMPLICIT_REJECTION_HASH_INPUT_SIZE: usize = SHARED_SECRET_SIZE + CPA_PKE_CIPHERTEXT_SIZE_512;
 
 // Kyber 512 types
+/// An ML-KEM 512 Ciphertext
 pub type MlKem512Ciphertext = MlKemCiphertext<CPA_PKE_CIPHERTEXT_SIZE_512>;
+/// An ML-KEM 512 Private key
 pub type MlKem512PrivateKey = MlKemPrivateKey<SECRET_KEY_SIZE_512>;
+/// An ML-KEM 512 Public key
 pub type MlKem512PublicKey = MlKemPublicKey<CPA_PKE_PUBLIC_KEY_SIZE_512>;
 
 /// Validate a public key.
 ///
-/// Returns `Some(public_key)` if valid, and `None` otherwise.
-pub fn validate_public_key(public_key: MlKem512PublicKey) -> Option<MlKem512PublicKey> {
-    if super::validate_public_key::<
+/// Returns `true` if valid, and `false` otherwise.
+pub fn validate_public_key(public_key: &MlKem512PublicKey) -> bool {
+    super::validate_public_key::<
         RANK_512,
         RANKED_BYTES_PER_RING_ELEMENT_512,
         CPA_PKE_PUBLIC_KEY_SIZE_512,
     >(&public_key.value)
-    {
-        Some(public_key)
-    } else {
-        None
-    }
 }
 
 /// Generate ML-KEM 512 Key Pair
+///
+/// The input is a byte array of size
+/// [`crate::KEY_GENERATION_SEED_SIZE`].
 pub fn generate_key_pair(
     randomness: [u8; KEY_GENERATION_SEED_SIZE],
 ) -> MlKemKeyPair<SECRET_KEY_SIZE_512, CPA_PKE_PUBLIC_KEY_SIZE_512> {
@@ -67,9 +68,11 @@ pub fn generate_key_pair(
     >(randomness)
 }
 
-pub type MlKem512State = MlKemState<RANK_512>;
+#[allow(unused)]
+pub(crate) type MlKem512State = MlKemState<RANK_512>;
 
-pub fn generate_key_pair_unpacked(
+#[allow(unused)]
+pub(crate) fn generate_key_pair_unpacked(
     randomness: [u8; KEY_GENERATION_SEED_SIZE],
 ) -> (MlKem512State, MlKem512PublicKey) {
     generate_keypair_unpacked::<
@@ -84,6 +87,9 @@ pub fn generate_key_pair_unpacked(
 }
 
 /// Encapsulate ML-KEM 512
+///
+/// Generates an ([`MlKem512Ciphertext`], [`MlKemSharedSecret`]) tuple.
+/// The input is a reference to an [`MlKem512PublicKey`] and [`crate::SHARED_SECRET_SIZE`]
 pub fn encapsulate(
     public_key: &MlKemPublicKey<CPA_PKE_PUBLIC_KEY_SIZE_512>,
     randomness: [u8; SHARED_SECRET_SIZE],
@@ -109,6 +115,9 @@ pub fn encapsulate(
 }
 
 /// Decapsulate ML-KEM 512
+///
+/// Generates an [`MlKemSharedSecret`].
+/// The input is a reference to an [`MlKem512PrivateKey`] and an [`MlKem512Ciphertext`].
 pub fn decapsulate(
     secret_key: &MlKemPrivateKey<SECRET_KEY_SIZE_512>,
     ciphertext: &MlKemCiphertext<CPA_PKE_CIPHERTEXT_SIZE_512>,
@@ -133,7 +142,8 @@ pub fn decapsulate(
     >(secret_key, ciphertext)
 }
 
-pub fn decapsulate_unpacked(
+#[allow(unused)]
+pub(crate) fn decapsulate_unpacked(
     state: &MlKem512State,
     ciphertext: &MlKemCiphertext<CPA_PKE_CIPHERTEXT_SIZE_512>,
 ) -> [u8; SHARED_SECRET_SIZE] {

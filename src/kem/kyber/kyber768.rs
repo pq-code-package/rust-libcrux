@@ -33,27 +33,28 @@ const ETA2_RANDOMNESS_SIZE: usize = ETA2 * 64;
 const IMPLICIT_REJECTION_HASH_INPUT_SIZE: usize = SHARED_SECRET_SIZE + CPA_PKE_CIPHERTEXT_SIZE_768;
 
 // Kyber 768 types
+/// An ML-KEM 768 Ciphertext
 pub type MlKem768Ciphertext = MlKemCiphertext<CPA_PKE_CIPHERTEXT_SIZE_768>;
+/// An ML-KEM 768 Private key
 pub type MlKem768PrivateKey = MlKemPrivateKey<SECRET_KEY_SIZE_768>;
+/// An ML-KEM 768 Public key
 pub type MlKem768PublicKey = MlKemPublicKey<CPA_PKE_PUBLIC_KEY_SIZE_768>;
 
 /// Validate a public key.
 ///
-/// Returns `Some(public_key)` if valid, and `None` otherwise.
-pub fn validate_public_key(public_key: MlKem768PublicKey) -> Option<MlKem768PublicKey> {
-    if super::validate_public_key::<
+/// Returns `true` if valid, and `false` otherwise.
+pub fn validate_public_key(public_key: &MlKem768PublicKey) -> bool {
+    super::validate_public_key::<
         RANK_768,
         RANKED_BYTES_PER_RING_ELEMENT_768,
         CPA_PKE_PUBLIC_KEY_SIZE_768,
     >(&public_key.value)
-    {
-        Some(public_key)
-    } else {
-        None
-    }
 }
 
 /// Generate ML-KEM 768 Key Pair
+///
+/// Generate an ML-KEM key pair. The input is a byte array of size
+/// [`crate::KEY_GENERATION_SEED_SIZE`].
 pub fn generate_key_pair(
     randomness: [u8; KEY_GENERATION_SEED_SIZE],
 ) -> MlKemKeyPair<SECRET_KEY_SIZE_768, CPA_PKE_PUBLIC_KEY_SIZE_768> {
@@ -68,9 +69,11 @@ pub fn generate_key_pair(
     >(randomness)
 }
 
-pub type MlKem768State = MlKemState<RANK_768>;
+#[allow(unused)]
+pub(crate) type MlKem768State = MlKemState<RANK_768>;
 
-pub fn generate_key_pair_unpacked(
+#[allow(unused)]
+pub(crate) fn generate_key_pair_unpacked(
     randomness: [u8; KEY_GENERATION_SEED_SIZE],
 ) -> (MlKem768State, MlKem768PublicKey) {
     generate_keypair_unpacked::<
@@ -85,6 +88,10 @@ pub fn generate_key_pair_unpacked(
 }
 
 /// Encapsulate ML-KEM 768
+///
+/// Generates an ([`MlKem768Ciphertext`], [`MlKemSharedSecret`]) tuple.
+/// The input is a reference to an [`MlKem768PublicKey`] and [`crate::SHARED_SECRET_SIZE`]
+/// bytes of `randomness`.
 pub fn encapsulate(
     public_key: &MlKemPublicKey<CPA_PKE_PUBLIC_KEY_SIZE_768>,
     randomness: [u8; SHARED_SECRET_SIZE],
@@ -110,6 +117,9 @@ pub fn encapsulate(
 }
 
 /// Decapsulate ML-KEM 768
+///
+/// Generates an [`MlKemSharedSecret`].
+/// The input is a reference to an [`MlKem768PrivateKey`] and an [`MlKem768Ciphertext`].
 pub fn decapsulate(
     secret_key: &MlKemPrivateKey<SECRET_KEY_SIZE_768>,
     ciphertext: &MlKemCiphertext<CPA_PKE_CIPHERTEXT_SIZE_768>,
@@ -134,7 +144,8 @@ pub fn decapsulate(
     >(secret_key, ciphertext)
 }
 
-pub fn decapsulate_unpacked(
+#[allow(unused)]
+pub(crate) fn decapsulate_unpacked(
     state: &MlKem768State,
     ciphertext: &MlKemCiphertext<CPA_PKE_CIPHERTEXT_SIZE_768>,
 ) -> [u8; SHARED_SECRET_SIZE] {
@@ -160,7 +171,7 @@ pub fn decapsulate_unpacked(
 
 #[cfg(test)]
 mod tests {
-    use rand_core::{OsRng, RngCore};
+    use rand::{rngs::OsRng, RngCore};
 
     use super::{
         kyber768::{generate_key_pair, validate_public_key},
@@ -173,6 +184,6 @@ mod tests {
         OsRng.fill_bytes(&mut randomness);
 
         let key_pair = generate_key_pair(randomness);
-        assert!(validate_public_key(key_pair.pk).is_some());
+        assert!(validate_public_key(&key_pair.pk));
     }
 }
