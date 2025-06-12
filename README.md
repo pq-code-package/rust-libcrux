@@ -99,9 +99,14 @@ Additional features:
 - `kyber`: Provides access to an, as yet, unverified implementation of
   Kyber as submitted in Round 3 of the NIST PQ competition. The Kyber
   APIs follow the general structure of the ML-KEM APIs.
-- `check-secret-independence`: Enforce secret independence at the
-  level of the Rust type-system (TODO: Elaborate why this is not
-  default.)
+- `check-secret-independence`: All operations on ring elements in the
+  portable implementation use the integer types of the
+  `libcrux-secrets` crate under the hood. That crate allows checking a
+  program operating on these types for secret indepence at compile
+  time. Enabling the `check-secret-independence` feature switches on
+  this compile-time checking of secret independence. By default, the
+  integer types of `libcrux-secrets` transparently fall back on Rust's
+  standard integer types.
 - `simd128`, `simd256`: These features force a compilation for NEON or
   AVX2 targets, respectively, as discussed above.
 - `incremental`: An experimental API, which allows for incremental
