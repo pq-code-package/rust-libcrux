@@ -123,10 +123,14 @@ constant-time code via inspection of the generated assembly
 instructions.
 
 ## Verification Status
-The code in this crate is formally verified for panic freedom,
-correctness and secret independence in F* using the hax toolchain.
+The portable and AVX2 code for field arithmetic, NTT polynomial
+arithmetic, serialization, and the generic code for high-level
+algorithms is formally verified using [hax](https://hax.cryspen.com) and [F*](https://fstar-lang.org).
 
-TODO
+Please refer to [this
+file](https://github.com/cryspen/libcrux/blob/f9d1802c06ffe1dec900367e12b00edb1e7f9963/libcrux-ml-kem/proofs/verification_status.md)
+in the `libcrux-ml-kem` repository for details on the verification of
+this crate.
 
 ## Performance
 We provide a dashboard of benchmark results for the main key
