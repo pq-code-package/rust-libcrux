@@ -129,7 +129,16 @@ correctness and secret independence in F* using the hax toolchain.
 TODO
 
 ## Performance
-TODO
+We provide a dashboard of benchmark results for the main key
+generation, encapsulation and decapsulation APIs across different
+platforms and operating systems at
+[libcrux.cryspen.com](https://libcrux.cryspen.com).
+
+If you wish to run the benchmarks yourself, you can do so by running
+```
+cargo bench
+```
+from the crate root of the `libcrux-ml-kem` crate.
 
 ## FAQ
 TODO
