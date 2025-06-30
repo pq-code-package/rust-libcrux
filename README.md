@@ -1,5 +1,4 @@
 [//]: # (SPDX-License-Identifier: CC-BY-4.0)
-[//]: # (TODO Customize project readme)
 
 # mlkem-rust-libcrux
 `mlkem-rust-libcrux` is a portable Rust implementation of ML-KEM which
