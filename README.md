@@ -113,7 +113,14 @@ Additional features:
   encapsulation.
 
 ## Security
-TODO
+As outlined in the description of the `check-secret-independence`
+feature above, we leverage the Rust type system to ensure that secret
+values are not used in operations that are known to be
+non-constant time. While the implementation of constant time
+operations is best-effort, as there are no guarantees from the
+compiler, we follow established constant-time patterns and validate
+constant-time code via inspection of the generated assembly
+instructions.
 
 ## Verification Status
 The code in this crate is formally verified for panic freedom,
