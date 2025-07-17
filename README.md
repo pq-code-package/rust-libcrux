@@ -101,7 +101,7 @@ Additional features:
 - `check-secret-independence`: All operations on ring elements in the
   portable implementation use the integer types of the
   `libcrux-secrets` crate under the hood. That crate allows checking a
-  program operating on these types for secret indepence at compile
+  program operating on these types for secret independence at compile
   time. Enabling the `check-secret-independence` feature switches on
   this compile-time checking of secret independence. By default, the
   integer types of `libcrux-secrets` transparently fall back on Rust's
