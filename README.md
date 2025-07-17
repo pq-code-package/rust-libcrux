@@ -16,7 +16,7 @@ cargo add libcrux-ml-kem
 in your project directory, or add
 
 ```
-libcrux-ml-kem = "0.0.2"
+libcrux-ml-kem = "0.0.3"
 ```
 to your `Cargo.toml`.
 
