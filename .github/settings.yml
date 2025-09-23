@@ -3,7 +3,7 @@
 #
 
 repository:
-  name: mlkem-rust-libcrux
+  name: rust-libcrux
   description: portable ML-KEM implementation with some optimizations for AVX2. Full AVX2 support will be added over the coming months. The code is formally verified for panic freedom, correctness, and secret independence in F* using the hax toolchain.
   homepage: https://github.com/pq-code-package/mlkem-rust-libcrux
   default_branch: main
